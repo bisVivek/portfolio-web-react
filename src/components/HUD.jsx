@@ -1,12 +1,13 @@
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { Target, TrendingUp, Webhook } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import LetterSpacedText from './LetterSpacedText'
 
 export default function HUD({ currentSection, scrollProgress, scrollToSection }) {
   const { scrollY } = useScroll()
   const [isVisible, setIsVisible] = useState(false)
+  const reduceMotion = useReducedMotion()
   
-  // Animate navbar visibility based on scroll
   const navOpacity = useTransform(scrollY, [0, 100], [0, 1])
   const navY = useTransform(scrollY, [0, 100], [-20, 0])
 
@@ -19,20 +20,29 @@ export default function HUD({ currentSection, scrollProgress, scrollToSection })
     
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', updateVisibility)
-      updateVisibility() // Initial check
+      updateVisibility()
       return () => window.removeEventListener('scroll', updateVisibility)
     }
   }, [])
 
-  const sections = ['Hero', 'Skills', 'Experience', 'Projects', 'Contact']
+  const sections = ['Hero', 'Skills', 'Experience', 'Projects', 'Rendering', 'Contact']
   const currentLevel = currentSection + 1
+  const navItems = [
+    { label: 'C Y P R I E N', sectionIndex: 0, title: 'Hero' },
+    { label: 'S K I L L S', sectionIndex: 1, title: 'Skills' },
+    { label: 'E X P', sectionIndex: 2, title: 'Experience' },
+    { label: 'P R O J', sectionIndex: 3, title: 'Projects' },
+    { label: 'A B O U T', sectionIndex: 4, title: 'About / Rendering' },
+    { label: 'C O N T A C T', sectionIndex: 5, title: 'Contact' },
+  ]
 
   const missions = [
     { name: 'Hero', completed: currentSection >= 0 },
     { name: 'Skills', completed: currentSection >= 1 },
     { name: 'Experience', completed: currentSection >= 2 },
     { name: 'Projects', completed: currentSection >= 3 },
-    { name: 'Contact', completed: currentSection >= 4 },
+    { name: 'Rendering', completed: currentSection >= 4 },
+    { name: 'Contact', completed: currentSection >= 5 },
   ]
 
   return (
@@ -49,12 +59,11 @@ export default function HUD({ currentSection, scrollProgress, scrollToSection })
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          {/* HP/Skills Bar */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                animate={reduceMotion ? undefined : { rotate: 360 }}
+                transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: 'linear' }}
               >
                 <TrendingUp className="w-5 h-5 text-spidey-red" />
               </motion.div>
@@ -63,7 +72,7 @@ export default function HUD({ currentSection, scrollProgress, scrollToSection })
                 <motion.div
                   className="health-fill"
                   initial={{ width: 0 }}
-                  animate={{ width: `${Math.min((currentSection + 1) / 5 * 100, 100)}%` }}
+                  animate={{ width: `${Math.min((currentSection + 1) / 6 * 100, 100)}%` }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>
@@ -74,11 +83,10 @@ export default function HUD({ currentSection, scrollProgress, scrollToSection })
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {Math.round((currentSection + 1) / 5 * 100)}%
+                {Math.round((currentSection + 1) / 6 * 100)}%
               </motion.span>
             </div>
 
-            {/* Level Counter */}
             <div className="flex items-center gap-2">
               <Target className="w-5 h-5 text-electric-blue" />
               <span className="text-sm font-mono text-gray-light">Level:</span>
@@ -89,12 +97,42 @@ export default function HUD({ currentSection, scrollProgress, scrollToSection })
                 animate={{ scale: 1, color: '#DC2626' }}
                 transition={{ duration: 0.4 }}
               >
-                {currentLevel}/5
+                {currentLevel}/6
               </motion.span>
             </div>
           </div>
 
-          {/* Mission Progress */}
+          {/* Jaquier-inspired spaced nav (md+) with letter animations */}
+          <nav className="hidden lg:flex items-center gap-6">
+            {navItems.map((item, index) => (
+              <motion.button
+                key={item.title}
+                type="button"
+                onClick={() => scrollToSection(item.sectionIndex)}
+                className={`text-[11px] uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spidey-red/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
+                  currentSection === item.sectionIndex ? 'text-gray-light' : 'text-gray-400'
+                }`}
+                aria-label={`Go to ${item.title} section`}
+                aria-current={currentSection === item.sectionIndex ? 'page' : undefined}
+                title={item.title}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+                whileHover={!reduceMotion ? {
+                  y: -2,
+                  transition: { duration: 0.2 }
+                } : undefined}
+              >
+                <LetterSpacedText 
+                  text={item.label} 
+                  spacing="0.35em"
+                  delay={index * 0.05}
+                  onHover={true}
+                />
+              </motion.button>
+            ))}
+          </nav>
+
           <div className="flex items-center gap-2">
             <span className="text-sm font-mono text-gray-light hidden md:inline">
               Missions:
@@ -109,23 +147,24 @@ export default function HUD({ currentSection, scrollProgress, scrollToSection })
                       ? 'bg-spidey-red shadow-lg shadow-spidey-red/50'
                       : 'bg-gray-dark border border-gray-600'
                   }`}
-                  whileHover={{ scale: 1.8, boxShadow: '0 0 15px rgba(220, 38, 38, 0.8)' }}
-                  whileTap={{ scale: 1.2 }}
+                  whileHover={reduceMotion ? undefined : { scale: 1.8, boxShadow: '0 0 15px rgba(220, 38, 38, 0.8)' }}
+                  whileTap={reduceMotion ? undefined : { scale: 1.2 }}
                   animate={{
                     scale: mission.completed && index === currentSection ? [1, 1.3, 1] : 1,
                   }}
                   transition={{ duration: 0.4 }}
                   title={mission.name}
+                  aria-label={`Go to ${mission.name} section`}
+                  aria-current={index === currentSection ? 'page' : undefined}
                 />
               ))}
             </div>
           </div>
 
-          {/* Web Ammo / Scroll Indicator */}
           <div className="flex items-center gap-2">
             <motion.div
-              animate={{ rotate: [0, 15, -15, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={reduceMotion ? undefined : { rotate: [0, 15, -15, 0] }}
+              transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity }}
             >
               <Webhook className="w-5 h-5 text-electric-blue" />
             </motion.div>
@@ -145,3 +184,4 @@ export default function HUD({ currentSection, scrollProgress, scrollToSection })
     </motion.div>
   )
 }
+

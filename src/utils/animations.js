@@ -109,3 +109,47 @@ export const getTransition = (defaultTransition) => {
   return defaultTransition
 }
 
+// Jaquier.dev-inspired animations
+export const letterSpacedReveal = {
+  hidden: { 
+    opacity: 0, 
+    y: 20,
+    filter: 'blur(4px)',
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.4,
+      ease: [0.6, -0.05, 0.01, 0.99],
+    },
+  },
+}
+
+export const smoothReveal = {
+  hidden: { 
+    opacity: 0, 
+    y: 60,
+    filter: 'blur(10px)',
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.8,
+      ease: [0.6, -0.05, 0.01, 0.99],
+    },
+  },
+}
+
+export const staggerLetters = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.02,
+    },
+  },
+}

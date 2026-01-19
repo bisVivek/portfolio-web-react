@@ -3,9 +3,17 @@ import { useEffect, useState } from 'react'
 export default function WebCursor() {
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [trails, setTrails] = useState([])
+  const [enabled, setEnabled] = useState(true)
 
   useEffect(() => {
+    // Disable cursor for users who prefer reduced motion (and keep mobile behavior as-is via CSS).
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    const updateEnabled = () => setEnabled(!(mediaQuery && mediaQuery.matches))
+    updateEnabled()
+    mediaQuery?.addEventListener?.('change', updateEnabled)
+
     const updateCursor = (e) => {
+      if (!enabled) return
       setPosition({ x: e.clientX, y: e.clientY })
       
       // Create trail
@@ -16,7 +24,6 @@ export default function WebCursor() {
     }
 
     const handleMouseLeave = () => {
-      // Hide cursor when mouse leaves
       setPosition({ x: -100, y: -100 })
     }
 
@@ -26,17 +33,20 @@ export default function WebCursor() {
     return () => {
       window.removeEventListener('mousemove', updateCursor)
       document.removeEventListener('mouseleave', handleMouseLeave)
+      mediaQuery?.removeEventListener?.('change', updateEnabled)
     }
-  }, [])
+  }, [enabled])
 
-  // Clean up old trails
   useEffect(() => {
+    if (!enabled) return
     const interval = setInterval(() => {
       setTrails((prev) => prev.filter((trail) => Date.now() - trail.id < 200))
     }, 50)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [enabled])
+
+  if (!enabled) return null
 
   return (
     <>
