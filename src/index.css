@@ -84,6 +84,16 @@ body {
   transition: opacity 0.3s ease-out;
 }
 
+.web-cursor-ribbon {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9997;
+  border-radius: 999px;
+  mix-blend-mode: screen;
+  box-shadow: 0 0 18px rgba(127, 29, 29, 0.35), 0 0 26px rgba(30, 58, 138, 0.25);
+  transform-origin: center;
+}
+
 /* Web Button Styles - Enhanced with GPU acceleration */
 .web-button {
   position: relative;
