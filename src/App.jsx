@@ -4,11 +4,11 @@ import Hero from './components/Hero'
 import Skills from './components/Skills'
 import Experience from './components/Experience'
 import Projects from './components/Projects'
+import RealTimeRendering from './components/RealTimeRendering'
 import Contact from './components/Contact'
 import HUD from './components/HUD'
 import WebCursor from './components/WebCursor'
 import ParticleDust from './components/ParticleDust'
-import AnimatedBackground from './components/AnimatedBackground'
 
 function App() {
   const lenisRef = useRef(null)
@@ -36,8 +36,7 @@ function App() {
       const progress = e.scroll / (e.limit - window.innerHeight)
       setScrollProgress(progress)
 
-      // Determine current section based on scroll
-      const sections = ['hero', 'skills', 'experience', 'projects', 'contact']
+      const sections = ['hero', 'skills', 'experience', 'projects', 'realtime-rendering', 'contact']
       const sectionIndex = Math.floor(progress * sections.length)
       setCurrentSection(Math.min(sectionIndex, sections.length - 1))
     }
@@ -61,6 +60,9 @@ function App() {
 
   return (
     <div className="relative min-h-screen bg-dark-bg">
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
       <WebCursor />
       <ParticleDust count={25} />
       
@@ -70,11 +72,12 @@ function App() {
         scrollToSection={scrollToSection}
       />
 
-      <main className="relative z-10">
+      <main id="main" className="relative z-10" tabIndex={-1}>
         <Hero id="hero" />
         <Skills id="skills" />
         <Experience id="experience" />
         <Projects id="projects" />
+        <RealTimeRendering id="realtime-rendering" />
         <Contact id="contact" />
       </main>
     </div>
@@ -82,3 +85,4 @@ function App() {
 }
 
 export default App
+

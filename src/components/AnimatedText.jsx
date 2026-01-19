@@ -35,4 +35,3 @@ export default function AnimatedText({ text, className = '', delay = 0 }) {
     </motion.h1>
   )
 }
-

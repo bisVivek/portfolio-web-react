@@ -40,4 +40,3 @@ export function useMouse3D(ref) {
 
   return { rotateX, rotateY }
 }
-

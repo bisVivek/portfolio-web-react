@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 
 export default function FullScreenBackground({ 
@@ -8,14 +8,15 @@ export default function FullScreenBackground({
   children 
 }) {
   const sectionRef = useRef(null)
+  const reduceMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'end start'],
   })
 
   // Enhanced parallax with smooth vertical movement
-  const y = parallax ? useTransform(scrollYProgress, [0, 1], [0, -200]) : 0
-  const scale = parallax ? useTransform(scrollYProgress, [0, 1], [1, 1.08]) : 1
+  const y = parallax && !reduceMotion ? useTransform(scrollYProgress, [0, 1], [0, -200]) : 0
+  const scale = parallax && !reduceMotion ? useTransform(scrollYProgress, [0, 1], [1, 1.08]) : 1
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.7, 0.9, 0.7])
 
   const overlayStyles = {
@@ -34,17 +35,26 @@ export default function FullScreenBackground({
       >
         <motion.img
           src={imageSrc}
-          alt="Background"
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover will-change-transform"
           style={{ opacity }}
-          animate={{
-            scale: [1, 1.03, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: [1, 1.03, 1],
+                }
+          }
+          transition={
+            reduceMotion
+              ? undefined
+              : {
+                  duration: 25,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }
+          }
           onError={(e) => {
             e.target.style.display = 'none'
           }}
@@ -56,15 +66,23 @@ export default function FullScreenBackground({
         {/* Animated gradient overlay for premium look */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-spidey-red/10"
-          animate={{
-            backgroundPosition: ['0% 0%', '100% 100%'],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "linear",
-          }}
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  backgroundPosition: ['0% 0%', '100% 100%'],
+                }
+          }
+          transition={
+            reduceMotion
+              ? undefined
+              : {
+                  duration: 15,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  ease: 'linear',
+                }
+          }
         />
       </motion.div>
 
